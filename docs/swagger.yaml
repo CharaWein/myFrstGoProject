@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: User and Profile API
+  description: API for managing users and their profiles
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    get:
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+# ... аналогично для других эндпоинтов
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        username:
+          type: string
+        messages:
+          type: array
+          items:
+            type: string
+    UserCreate:
+      type: object
+      required:
+        - email
+        - username
+      properties:
+        email:
+          type: string
+        username:
+          type: string
+    Profile:
+      type: object
+      properties:
+        profile_id:
+          type: string
+          format: uuid
+        friends:
+          type: array
+          items:
+            type: string
+        subscribes_count:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
