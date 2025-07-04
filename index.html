@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go Backend Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .section { margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>API Тестер</h1>
+    
+    <div class="section">
+        <h2>Пользователи</h2>
+        <button onclick="createUser()">Создать пользователя</button>
+        <button onclick="getAllUsers()">Получить всех</button>
+        
+        <div>
+            <h3>Поиск по ID:</h3>
+            <input type="text" id="userId" placeholder="UUID пользователя">
+            <button onclick="getUser()">Найти</button>
+            <button onclick="deleteUser()">Удалить</button>
+        </div>
+        
+        <pre id="userResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Профили</h2>
+        <button onclick="createProfile()">Создать профиль</button>
+        <button onclick="getAllProfiles()">Получить все</button>
+        
+        <div>
+            <h3>Поиск по имени:</h3>
+            <input type="text" id="usernameSearch" placeholder="Имя пользователя">
+            <button onclick="searchProfile()">Найти</button>
+        </div>
+        
+        <pre id="profileResult"></pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        
+        async function fetchData(url, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (body) options.body = JSON.stringify(body);
+            
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                document.getElementById('userResult').textContent = `Error: ${error.message}`;
+                return { error: error.message };
+            }
+        }
+
+        // User functions
+        async function createUser() {
+            const user = {
+                email: `test${Math.random().toString(36).substring(7)}@example.com`,
+                username: `user${Math.random().toString(36).substring(7)}`
+            };
+            const result = await fetchData(`${API_URL}/users`, 'POST', user);
+            document.getElementById('userResult').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function getAllUsers() {
+            const result = await fetchData(`${API_URL}/users`);
+            document.getElementById('userResult').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function getUser() {
+            const userId = document.getElementById('userId').value;
+            const result = await fetchData(`${API_URL}/users/${userId}`);
+            document.getElementById('userResult').textContent = JSON.stringify(result, null, 2);
+        }
+
+        // Profile functions
+        async function createProfile() {
+            const profile = {
+                friends: ['friend1', 'friend2'],
+                subscribes_count: 5,
+                user_id: prompt("Введите user_id пользователя:")
+            };
+            const result = await fetchData(`${API_URL}/profiles`, 'POST', profile);
+            document.getElementById('profileResult').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function searchProfile() {
+            const username = document.getElementById('usernameSearch').value;
+            const result = await fetchData(`${API_URL}/profiles/search?username=${username}`);
+            document.getElementById('profileResult').textContent = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>
