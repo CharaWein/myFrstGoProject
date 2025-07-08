@@ -1,0 +1,25 @@
+# Environment files
+.env
+.env.local
+
+# Binaries
+bin/
+dist/
+
+# IDE
+.idea/
+.vscode/
+
+# Build artifacts
+*.exe
+*.test
+*.out
+
+# Dependency directories
+vendor/
+go.mod
+go.sum
+
+# Debug files
+debug
+*.log
